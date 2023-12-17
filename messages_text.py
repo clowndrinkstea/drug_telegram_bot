@@ -28,3 +28,11 @@ drug_amount_input_text = "Сколько надо кушать?"
 int_format_error_text = "💢💢💢 Это не число 💢💢💢"
 
 head_notification_text = "Нужно скушать:\n"
+
+delete_drug_text = "Удали..."
+
+choose_drug_text = "Выберите колёсики"
+
+nothing_to_delete_text = "Упс, ничего нет"
+
+deleted_text = "Готово:)"

@@ -1,11 +1,12 @@
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
 from messages_text import add_new_drug_text, notification_list_text, to_main_page_text, drug_type_ml_text, \
-    drug_type_count_text, drug_type_sachet_text, drug_type_dose_text
+    drug_type_count_text, drug_type_sachet_text, drug_type_dose_text, delete_drug_text
 
 main_menu = [
     [KeyboardButton(text=add_new_drug_text, resize_keyboard=True)],
     [KeyboardButton(text=notification_list_text, resize_keyboard=True)],
+    [KeyboardButton(text=delete_drug_text, resize_keyboard=True)]
 ]
 main_menu = ReplyKeyboardMarkup(keyboard=main_menu)
 

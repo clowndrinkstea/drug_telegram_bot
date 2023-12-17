@@ -1,23 +1,24 @@
 import datetime
 import json
-import time
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import delete
 
 from database.models import Notification
 from serializers import notification_serializer
 from database.base import async_session
 from database.methods import get_user_by_message, create_user_by_message, clean_user_meta, get_notifications_by_user, \
-    get_current_notifications, get_user_by_id
+    get_current_notifications, get_user_by_id, get_drug_by_message
 from menu.menu_templates import drug_type_menu, only_to_main_menu, main_menu
 from messages_text import hi_text, add_new_drug_text, notification_list_text, hi_again_text, to_main_page_text, \
     drug_name_text, course_days_text, period_text, done_text, drug_type_text, drug_amount_input_text, \
-    date_input_text, date_format_error_text, int_format_error_text
+    date_input_text, date_format_error_text, int_format_error_text, delete_drug_text, choose_drug_text, \
+    nothing_to_delete_text, deleted_text
 import asyncio
 import logging
-from aiogram import Bot, Dispatcher, types, F
+from aiogram import Bot, Dispatcher, F
 from aiogram.filters.command import Command
-from aiogram.types import Message
+from aiogram.types import Message, KeyboardButton, ReplyKeyboardMarkup
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token='6596678022:AAGTOIpq4YO2CxSA0n4bz0jHb19deh4ebK0')
@@ -57,6 +58,33 @@ async def cmd_notification_list_text(message: Message, session: AsyncSession):
     notifications = await get_notifications_by_user(session, user)
 
     await message.answer(notification_serializer.serialize(notifications), reply_markup=only_to_main_menu)
+
+
+@dp.message(F.text == delete_drug_text)
+async def cmd_select_drug(message: Message, session: AsyncSession):
+    user = await get_user_by_message(session, message)
+    meta = json.loads(user.meta)
+
+    meta['stage_passed'] = 'delete_drug'
+
+    user.meta = json.dumps(meta)
+    await session.commit()
+
+    info = await get_drug_by_message(session, message)
+
+    drug_names = [str(drug.drug_name) for drug in info]
+    if drug_names:
+        answer = choose_drug_text
+        delete_drug_menu = []
+        for name in drug_names:
+            delete_drug_menu.append([KeyboardButton(text=name)])
+
+        delete_drug_menu = ReplyKeyboardMarkup(keyboard=delete_drug_menu)
+
+        await message.answer(answer, reply_markup=delete_drug_menu)
+    else:
+        answer = nothing_to_delete_text
+        await message.answer(answer, reply_markup=main_menu)
 
 
 @dp.message()
@@ -139,6 +167,13 @@ async def cmd_msg(message: Message, session: AsyncSession):
             await session.commit()
 
             msg = done_text
+
+    elif meta['stage_passed'] == 'delete_drug':
+        name_to_delete = message.text
+        task = delete(Notification).where(Notification.drug_name == name_to_delete)
+        await session.execute(task)
+
+        msg = deleted_text
 
     user.meta = json.dumps(meta)
     await session.commit()
