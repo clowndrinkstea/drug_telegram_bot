@@ -3,6 +3,8 @@ notification_list_text = "Список напоминалок"
 hi_text = "Привет"
 hi_again_text = "Добавим 💊 или посмотрим какие 💊 есть?"
 
+name_too_long_text = "💢💢💢 А можно покороче? 💢💢💢"
+
 to_main_page_text = "На главную"
 
 drug_name_text = "Какие колесики нужно кушать?"
@@ -23,7 +25,7 @@ drug_type_sachet_text = "саше"
 drug_type_dose_text = "доза"
 drug_amount_input_text = "Сколько надо кушать?"
 
-int_format_error_text = "💢💢💢 Это не число 💢💢💢"
+int_format_error_text = "💢💢💢 Кажется, такого не бывает 💢💢💢"
 
 head_notification_text = "Нужно скушать:\n"
 

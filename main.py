@@ -13,7 +13,7 @@ from menu.menu_templates import drug_type_menu, only_to_main_menu, main_menu
 from messages_text import hi_text, add_new_drug_text, notification_list_text, hi_again_text, to_main_page_text, \
     drug_name_text, course_days_text, done_text, drug_type_text, drug_amount_input_text, \
     date_input_text, date_format_error_text, int_format_error_text, delete_drug_text, choose_drug_text, \
-    nothing_to_delete_text, deleted_text
+    nothing_to_delete_text, deleted_text, name_too_long_text
 import asyncio
 import logging
 from aiogram import Bot, Dispatcher, F
@@ -95,11 +95,15 @@ async def cmd_msg(message: Message, session: AsyncSession):
     msg = ''
 
     if meta['stage_passed'] == 'add_new_drug':
-        meta['drug_name'] = message.text
-        meta['stage_passed'] = 'drug_name'
+        if len(message.text) < 256:
+            meta['drug_name'] = message.text
+            meta['stage_passed'] = 'drug_name'
 
-        msg = drug_type_text
-        reply_markup = drug_type_menu
+            msg = drug_type_text
+            reply_markup = drug_type_menu
+        else:
+            msg = name_too_long_text
+
 
     elif meta['stage_passed'] == 'drug_name':
         meta['drug_type'] = message.text
@@ -119,6 +123,9 @@ async def cmd_msg(message: Message, session: AsyncSession):
     elif meta['stage_passed'] == 'amount':
         try:
             inp = message.text.split(' ')
+            if not (len(inp) == 2 and -1 < int(inp[0]) < 25 and -1 < int(inp[1]) < 61):
+                raise Exception
+
             hours = int(inp[0])
             minutes = int(inp[1])
 
@@ -133,7 +140,8 @@ async def cmd_msg(message: Message, session: AsyncSession):
     elif meta['stage_passed'] == 'notification_time':
         try:
             course = int(message.text)
-
+            if not (course > 0):
+                raise Exception
             meta['stage_passed'] = 'course'
             meta['course'] = course
 
@@ -194,6 +202,7 @@ async def main():
     bot_task = asyncio.create_task(run_bot())
 
     await asyncio.gather(loop_task_notifications, bot_task)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
