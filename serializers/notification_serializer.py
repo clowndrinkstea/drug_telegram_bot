@@ -20,8 +20,6 @@ def serialize(notifications: List[Notification]) -> str:
             notification.notification_minute
         )
 
-        if notification.period > 0:
-            additional_text += '\nповторять курс каждые {} дней'.format(notification.period)
 
         head_text += additional_text
 

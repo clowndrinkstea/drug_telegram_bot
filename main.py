@@ -137,20 +137,9 @@ async def cmd_msg(message: Message, session: AsyncSession):
             meta['stage_passed'] = 'course'
             meta['course'] = course
 
-            msg = period_text
         except Exception as e:
-            msg = int_format_error_text
-
-    elif meta['stage_passed'] == 'course':
-        try:
-            period = int(message.text)
-        except Exception as e:
-            print(e)
             msg = int_format_error_text
         else:
-            meta['stage_passed'] = 'period'
-            meta['period'] = period
-
             notification = Notification(
                 drug_name=meta['drug_name'],
                 start_date=datetime.datetime.now(),
@@ -159,7 +148,6 @@ async def cmd_msg(message: Message, session: AsyncSession):
                 notification_hour=meta['notification_hour'],
                 notification_minute=meta['notification_minute'],
                 end_date=datetime.datetime.now() + datetime.timedelta(days=meta['course']),
-                period=meta['period'],
                 user_id=user.id,
             )
 

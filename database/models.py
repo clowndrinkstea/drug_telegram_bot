@@ -32,6 +32,5 @@ class Notification(BaseModel):
     drug_type = Column('drug_type', String(255), nullable=False, default='')
     amount = Column('amount', Integer, nullable=False)
     end_date = Column('end_date', DateTime, nullable=False)
-    period = Column('period', Integer, nullable=True, default=-1)
 
     user_id = Column(Integer, ForeignKey('users.id'))
