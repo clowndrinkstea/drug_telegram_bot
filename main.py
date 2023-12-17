@@ -170,7 +170,8 @@ async def cmd_msg(message: Message, session: AsyncSession):
 
     elif meta['stage_passed'] == 'delete_drug':
         name_to_delete = message.text
-        task = delete(Notification).where(Notification.drug_name == name_to_delete)
+
+        task = delete(Notification).where(Notification.drug_name == name_to_delete and Notification.user_id == user.id)
         await session.execute(task)
 
         msg = deleted_text

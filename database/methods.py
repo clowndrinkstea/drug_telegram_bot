@@ -68,12 +68,7 @@ async def get_user_by_id(session: AsyncSession, user_id: int) -> User:
 
 
 async def get_drug_by_message(session: AsyncSession, message: Message):
-    telegram_id = message.from_user.id
-    chat_id = message.chat.id
-
-    task = select(User).where(User.telegram_id == telegram_id and User.chat_id == chat_id)
-    result = await session.execute(task)
-    user = result.scalars().first()
+    user = await get_user_by_message(session, message)
     user_id = user.id
 
     task = select(Notification).where(Notification.user_id == user_id)
