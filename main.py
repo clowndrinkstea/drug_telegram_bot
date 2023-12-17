@@ -8,10 +8,10 @@ from database.models import Notification
 from serializers import notification_serializer
 from database.base import async_session
 from database.methods import get_user_by_message, create_user_by_message, clean_user_meta, get_notifications_by_user, \
-    get_current_notifications, get_user_by_id, get_drug_by_message
+    get_current_notifications, get_user_by_id, get_drug_by_message, get_notifications_to_delete
 from menu.menu_templates import drug_type_menu, only_to_main_menu, main_menu
 from messages_text import hi_text, add_new_drug_text, notification_list_text, hi_again_text, to_main_page_text, \
-    drug_name_text, course_days_text, period_text, done_text, drug_type_text, drug_amount_input_text, \
+    drug_name_text, course_days_text, done_text, drug_type_text, drug_amount_input_text, \
     date_input_text, date_format_error_text, int_format_error_text, delete_drug_text, choose_drug_text, \
     nothing_to_delete_text, deleted_text
 import asyncio
@@ -178,6 +178,8 @@ async def send_notifications():
             user = await get_user_by_id(session, notification.user_id)
             await bot.send_message(user.chat_id, notification_serializer.serialize([notification]))
 
+        await get_notifications_to_delete(session)
+
         await asyncio.sleep(60 - datetime.datetime.now().second)
 
 
@@ -187,11 +189,11 @@ async def run_bot():
 
 
 async def main():
-    loop_task = asyncio.create_task(send_notifications())
+    loop_task_notifications = asyncio.create_task(send_notifications())
 
     bot_task = asyncio.create_task(run_bot())
 
-    await asyncio.gather(loop_task, bot_task)
+    await asyncio.gather(loop_task_notifications, bot_task)
 
 if __name__ == "__main__":
     asyncio.run(main())

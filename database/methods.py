@@ -3,7 +3,7 @@ import json
 from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, delete
 
 from database.models import User, Notification
 from aiogram.types import Message
@@ -76,3 +76,13 @@ async def get_drug_by_message(session: AsyncSession, message: Message):
     drugs_info = result.scalars().all()
 
     return drugs_info
+
+
+async def get_notifications_to_delete(session: AsyncSession):
+    now_datetime = datetime.datetime.now()
+    task = delete(Notification).where(Notification.end_date < now_datetime)
+
+    await session.execute(task)
+    result = await session.commit()
+
+    return result
