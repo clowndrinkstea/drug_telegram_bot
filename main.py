@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import delete
 
 from database.models import Notification
-from serializers import notification_serializer
+from view import notifications_view
 from database.base import async_session
 from database.methods import get_user_by_message, create_user_by_message, clean_user_meta, get_notifications_by_user, \
     get_current_notifications, get_user_by_id, get_drug_by_message, get_notifications_to_delete
@@ -57,7 +57,7 @@ async def cmd_notification_list_text(message: Message, session: AsyncSession):
     user = await get_user_by_message(session, message)
     notifications = await get_notifications_by_user(session, user)
 
-    await message.answer(notification_serializer.serialize(notifications), reply_markup=only_to_main_menu)
+    await message.answer(notifications_view.get_view(notifications), reply_markup=only_to_main_menu)
 
 
 @dp.message(F.text == delete_drug_text)
@@ -184,7 +184,7 @@ async def send_notifications():
 
         for notification in current_notifications:
             user = await get_user_by_id(session, notification.user_id)
-            await bot.send_message(user.chat_id, notification_serializer.serialize([notification]))
+            await bot.send_message(user.chat_id, notifications_view.get_view([notification]))
 
         await get_notifications_to_delete(session)
 

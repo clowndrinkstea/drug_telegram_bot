@@ -4,7 +4,7 @@ from database.models import Notification
 from messages_text import head_notification_text
 
 
-def serialize(notifications: List[Notification]) -> str:
+def get_view(notifications: List[Notification]) -> str:
     head_text = head_notification_text
 
     for notification in notifications:
